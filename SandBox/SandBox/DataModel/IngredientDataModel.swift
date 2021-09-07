@@ -5,8 +5,6 @@
 //  Created by Daniel Watson on 06/09/2021.
 //
 
-import Foundation
-import SwiftUI
 import CoreData
 
 class IngredientDataModel: ObservableObject {

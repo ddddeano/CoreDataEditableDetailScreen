@@ -9,11 +9,11 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject var dataModel: IngredientDataModel
+    @StateObject var viewModel = IngredientsControl()
     
     @State var name = ""
     
     var body: some View {
-        NavigationView {
         VStack {
             TextField("Ingredient Name", text: $name)
             Image(systemName: "plus")
@@ -21,12 +21,7 @@ struct ContentView: View {
                     dataModel.add(name)
                 }
             ForEach(dataModel.ingredients, id:\.self) { ingredient in
-                NavigationLink(
-                    destination: IngredientDetailView(ingredient: ingredient)
-                ) {
-                    IngredientRowView(ingredient: ingredient)
-                    }
-                }
+                IngredientRowView(ingredient: ingredient).environmentObject(dataModel)
             }
         }
     }
@@ -34,25 +29,27 @@ struct ContentView: View {
 
 struct IngredientDetailView: View {
     @EnvironmentObject var dataModel: IngredientDataModel
-    var ingredient: Ingredient
-    
-    @State var name = ""
+    @StateObject var viewModel: IngredientDetailViewModel
     
     var body: some View {
         VStack {
-            TextField(ingredient.displayName, text: $name)
+            TextField(viewModel.ingredient.displayName, text: $viewModel.name)
             Image(systemName: "pencil.circle")
                 .onTapGesture {
-                    dataModel.changeName(ingredient, name)
+                    dataModel.changeName(viewModel.ingredient, viewModel.name)
             }
         }
     }
 }
 
 struct IngredientRowView: View {
+    @EnvironmentObject var dataModel: IngredientDataModel
     var ingredient: Ingredient
     var body: some View {
+        NavigationLink(
+            destination: IngredientDetailView(viewModel: IngredientDetailViewModel(ingredient)).environmentObject(dataModel)
+        ) {
         Text(ingredient.displayName)
+        }
     }
 }
-
